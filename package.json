@@ -24,14 +24,16 @@
     "compression": "^1.7.4",
     "express": "^4.17.1",
     "helmet": "^4.4.1",
+    "mbt": "^1.1.0",
     "mysql": "^2.18.1",
     "passport": "^0.4.1",
+    "run-s": "^0.0.0",
     "sap-cf-mailer": "gregorwolf/sap-cf-mailer#update-dependencies",
     "swagger-ui-express": "^4.1.6"
   },
   "devDependencies": {
     "@openui5/ts-types": "^1.60.5",
-    "copyfiles": "2.4.1",
+    "copyfiles": "^2.4.1",
     "jest": "^26.6.3",
     "npm-run-all": "^4.1.5",
     "sqlite3": "5.0.0",
@@ -61,7 +63,7 @@
     "build:xs-security": "cds compile srv/ --to xsuaa > xs-security.json",
     "build:cf": "cp mta-cf.yaml mta.yaml && mbt build -p=cf && rm mta.yaml",
     "build:xsa": "cp mta-xsa.yaml mta.yaml && mbt build -p=xsa && rm mta.yaml",
-    "build:OpenAPI": "mkdir -p srv/gen && npx -p @sap/cds-dk cds compile --to openapi srv -s AdminService > srv/gen/OpenAPI.json",
+    "build:OpenAPI": "cds compile --to openapi srv -s AdminService > srv/gen/OpenAPI.json",
     "build:copyOpenAPItogen": "copyfiles -f srv/gen/OpenAPI.json gen/srv/srv/gen/",
     "build:copycsntoproxy": "copyfiles -f gen/srv/srv/csn.json standalone-v2-proxy/gen/",
     "debug": "node --inspect node_modules/@sap/cds/bin/cds.js run",
@@ -80,11 +82,7 @@
     },
     "requires": {
       "db": {
-        "kind": "sqlite",
-        "model": "db",
-        "credentials": {
-          "database": "db/bookshop.db"
-        }
+        "kind": "sql"
       },
       "GWSAMPLE_BASIC": {
         "kind": "odata",

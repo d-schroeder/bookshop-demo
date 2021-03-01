@@ -51,6 +51,8 @@ entity Books : managed {
       releaseDate                        : DateTime     @title : 'Release Date (DateTime)';
       readingTime                        : Time         @title : 'Reading Time (Time)';
       author                             : Association to one Authors;
+      validFrom                          : Date         @cds.valid.from;
+      validTo                            : Date         @cds.valid.to;
       BooksAuthorsAssignment_ASSOC_Books : Association to many BooksAuthorsAssignment
                                              on BooksAuthorsAssignment_ASSOC_Books.ASSOC_Book = $self;
 };

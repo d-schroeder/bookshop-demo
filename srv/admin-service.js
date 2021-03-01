@@ -1,8 +1,8 @@
 const { resolve } = require("@sap/cds");
 const JobSchedulerClient = require("@sap/jobs-client");
 const xsenv = require("@sap/xsenv");
-const SapCfMailer = require('sap-cf-mailer').default;
-const metering = require('./metering')
+const SapCfMailer = require("sap-cf-mailer").default;
+const metering = require("./metering");
 
 function getJobscheduler(req) {
   xsenv.loadEnv();
@@ -30,23 +30,23 @@ module.exports = async function (srv) {
     Authors,
   } = srv.entities;
 
-  const external = await cds.connect.to('ZPDCDS_SRV')
+  const external = await cds.connect.to("ZPDCDS_SRV");
 
-  srv.before('*', '*', req => metering.beforeHandler(req))
+  srv.before("*", "*", (req) => metering.beforeHandler(req));
 
-  srv.on ('READ',['SEPMRA_I_Product_E'], async req => {
-    const externalTransaction = external.transaction(req)
+  srv.on("READ", ["SEPMRA_I_Product_E"], async (req) => {
+    const externalTransaction = external.transaction(req);
     try {
-      let result = await externalTransaction.run(req.query)
+      let result = await externalTransaction.run(req.query);
       // result.forEach(cleanObject);
-      return result
+      return result;
     } catch (error) {
-      console.error("Error Message: " + error.message)
-      if(error.request && error.request.path) {
-        console.error("Request Path: " + error.request.path)
+      console.error("Error Message: " + error.message);
+      if (error.request && error.request.path) {
+        console.error("Request Path: " + error.request.path);
       }
     }
-  })
+  });
 
   srv.before("READ", [Books, Authors], async (req) => {
     var tx = cds.transaction(req);
@@ -97,6 +97,12 @@ module.exports = async function (srv) {
     }
   });
 
+  srv.before("READ", Books, (req) => {
+    req._["VALID-FROM"] = "2001-12-12 00:00:00.000Z";
+    req._["VALID-TO"] = "2005-12-31 00:00:00.000Z";
+    console.log("changed");
+  });
+
   srv.before("UPDATE", Books, (req) => {
     var where = req.query.UPDATE.where;
     var changedEntity = JSON.stringify(req.query.UPDATE.entity);
@@ -123,28 +129,28 @@ module.exports = async function (srv) {
 
   srv.on(["readCdsEnv"], (req) => {
     return JSON.stringify(cds.env);
-  })
+  });
 
   srv.on(["readJobs"], (req) => {
     return new Promise((resolve, reject) => {
-      const scheduler = getJobscheduler(req)
+      const scheduler = getJobscheduler(req);
       if (scheduler) {
-        var query = {}
+        var query = {};
         scheduler.fetchAllJobs(query, function (err, result) {
           if (err) {
-            reject(req.error("Error retrieving jobs"))
+            reject(req.error("Error retrieving jobs"));
           }
           //Jobs retrieved successfully
           if (result && result.results && result.results.length > 0) {
             resolve(result.results);
           } else {
-            reject(req.warn("Can't find any job"))
+            reject(req.warn("Can't find any job"));
           }
-        })
+        });
       }
-    })
-  })
-  
+    });
+  });
+
   srv.on(["readJobDetails"], (req) => {
     return new Promise((resolve, reject) => {
       const scheduler = getJobscheduler(req);
@@ -196,8 +202,8 @@ module.exports = async function (srv) {
           if (err) {
             reject(req.error("Error retrieving job action logs"));
           } else {
-            console.log(result.results)
-            resolve(JSON.stringify(result.results))
+            console.log(result.results);
+            resolve(JSON.stringify(result.results));
           }
         });
       }
@@ -212,14 +218,14 @@ module.exports = async function (srv) {
           jobId: req.data.jobId,
           scheduleId: req.data.scheduleId,
           page_size: req.data.page_size,
-          offset: req.data.offset
-        }
+          offset: req.data.offset,
+        };
         scheduler.getRunLogs(query, function (err, result) {
           if (err) {
-            reject(req.error("Error retrieving job run logs"))
+            reject(req.error("Error retrieving job run logs"));
           } else {
             // console.log(result.results)
-            resolve(result.results)
+            resolve(result.results);
           }
         });
       }
@@ -310,9 +316,9 @@ module.exports = async function (srv) {
     const transporter = new SapCfMailer("mailtrap");
     // use sendmail as you should use it in nodemailer
     const result = await transporter.sendMail({
-      to: 'someoneimportant@sap.com',
+      to: "someoneimportant@sap.com",
       subject: `This is the mail subject`,
-      text: `body of the email`
+      text: `body of the email`,
     });
     return JSON.stringify(result);
   });
